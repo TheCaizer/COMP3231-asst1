@@ -9,8 +9,12 @@
 /********************************************************************************
  Document your resource order here. 
 ********************************************************************************/
-
-
+/*
+changed so that ben acquires lock a then lock b since bill also want a and b in 
+different order so change the order for request for both to remove circular deadlock:
+1. locka
+2. lockb
+*/
 
 /* declare (local to this file) pointers to the synch variables that
    we will allocate later */
@@ -97,8 +101,8 @@ static void ben(void * unusedpointer, unsigned long unusedint)
                 
                 lock_release(locka);
 
-                lock_acquire(lockb);
                 lock_acquire(locka);
+                lock_acquire(lockb);
 
                                         /* Ben now holds both locks and can do
                                          what ever ben needs to do while holding

@@ -21,6 +21,9 @@
 data_item_t * item_buffer[BUFFER_SIZE];
 
 volatile int write_head, read_tail;
+struct lock *buffer_lock;
+struct semaphore *full_sem;
+struct semaphore *empt_sem;
 
 
 

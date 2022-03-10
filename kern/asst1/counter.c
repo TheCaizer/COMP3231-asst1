@@ -13,7 +13,8 @@
  * INSERT ANY GLOBAL VARIABLES THAT YOU MAY REQUIRE HERE
  * ********************************************************************
  */
-
+// Global varaible for a lock
+struct lock* locker;
 
 /*
  * counter_initialise() allocates a synchronised counter and initialises
@@ -35,7 +36,12 @@ struct sync_counter * counter_initialise(int val)
         }
 
         sc_ptr->counter = val;
-        
+        locker = lock_create("locker");
+
+        if(locker == NULL){
+            // Allocation failed
+            return NULL;
+        }
         /*
          * ********************************************************************
          * INSERT ANY INITIALISATION CODE YOU MAY REQUIRE HERE
@@ -65,6 +71,8 @@ int counter_read_and_destroy(struct sync_counter *sc_ptr)
          * **********************************************************************
          */
         kfree(sc_ptr);
+        // free mem of lock
+        lock_destroy(locker);
         return count;
 }
 
@@ -75,7 +83,11 @@ int counter_read_and_destroy(struct sync_counter *sc_ptr)
 
 void counter_increment(struct sync_counter *sc_ptr)
 {
+        // acquire lock
+        lock_acquire(locker);
         sc_ptr->counter = sc_ptr->counter + 1;
+        // release lock
+        lock_release(locker);
 }
 
 /*
@@ -85,6 +97,10 @@ void counter_increment(struct sync_counter *sc_ptr)
 
 void counter_decrement(struct sync_counter *sc_ptr)
 {
+        // acquire lock
+        lock_acquire(locker);
         sc_ptr->counter = sc_ptr->counter - 1;
+        // release lock
+        lock_release(locker);
 }
 

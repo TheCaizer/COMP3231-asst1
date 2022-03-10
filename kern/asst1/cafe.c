@@ -88,13 +88,19 @@ void leave_cafe(unsigned long customer_num)
 
 unsigned long wait_to_order(unsigned long customer_number, unsigned int ticket)
 {
-        unsigned long barista_number = 1000;
+        unsigned long barista_number = 200000000;
 
         lock_acquire(table_lock);
         customer[customer_number] = ticket;
         for(int i = 0; i <= NUM_BARISTAS;i++){
             if(i == NUM_BARISTAS){
                 cv_wait(cv_cust[customer_number], table_lock);
+                // change this to find the number that the barista is
+                for(int l = 0; l < NUM_BARISTAS;l++){
+                    if(barista[l] == ticket){
+                        barista_number = l;
+                    }
+                }
             }
 
             else if(barista[i] == ticket){
@@ -109,17 +115,23 @@ unsigned long wait_to_order(unsigned long customer_number, unsigned int ticket)
 
 unsigned long announce_serving_ticket(unsigned long barista_number, unsigned int serving)
 {
-        unsigned long cust = 1000;
+        unsigned long cust = 100000000;
 
         lock_acquire(table_lock);
         barista[barista_number] = serving;
-        for(int i = 0; i <= NUM_CUSTOMERS;i++){
-            if(i == NUM_CUSTOMERS){
+        for(int j = 0; j <= NUM_CUSTOMERS;j++){
+            if(j == NUM_CUSTOMERS){
                 cv_wait(cv_bar[barista_number], table_lock);
+                // change this to find the number that the barista is
+                for(int k = 0; k < NUM_CUSTOMERS;k++){
+                    if(customer[k] == serving){
+                        cust = k;
+                    }
+                }
             }
-            else if(customer[i] == serving){
-                cust = i;
-                cv_signal(cv_cust[i], table_lock);
+            else if(customer[j] == serving){
+                cust = j;
+                cv_signal(cv_cust[j], table_lock);
                 break;
             }
         }
